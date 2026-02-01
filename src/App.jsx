@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import  { useState, useEffect } from 'react';
 import "98.css";
 
 function App() {
   const [pickedColors, setPickedColors] = useState(() => {
     return JSON.parse(localStorage.getItem("colors-list")) || [];
   });
+
+  const [toast, setToast] = useState("");
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setToast(`Copied: ${text}`);
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(""), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const hexToRgb = (hex) => {
     const bigInt = parseInt(hex.slice(1), 16);
@@ -24,6 +37,23 @@ function App() {
 
   return (
     <div className="window" style={{ width: '320px', margin: '10px' }}>
+
+    {toast && (
+        <div className="window toast-animation" style={{ 
+          position: 'absolute', 
+          bottom: '20px', 
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          zIndex: 1000,
+          width: '200px'
+        }}>
+          <div className="window-body" style={{ textAlign: 'center', padding: '5px' }}>
+            <p>{toast}</p>
+          </div>
+        </div>
+      )}
+
+
       <div className="title-bar">
         <div className="title-bar-text">ColorPicker.exe</div>
         <div className="title-bar-controls">
@@ -50,9 +80,9 @@ function App() {
         </div>
 
         {/* The "Inset" storage area */}
-        <div className="sunken-panel" style={{ marginTop: '15px', padding: '10px', height: '150px', overflowY: 'auto' }}>
+        <div className="sunken-panel" style={{ marginTop: '15px', padding: '6px', height: '150px', overflowY: 'auto' }}>
 
-          <table style={{ width: '100%' }}>
+          <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
             <thead>
               <tr>
                 <th>Color</th>
@@ -66,11 +96,11 @@ function App() {
                   <td>
                     <div style={{ width: '12px', height: '12px', backgroundColor: color, border: '1px solid #000' }}></div>
                   </td>
-                  <td style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(color)}>
-                    {color}
+                  <td style={{ cursor: 'pointer' }} onClick={() => handleCopy(color)}>
+        <strong>{color}</strong>
                   </td>
-              <td style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(hexToRgb(color))}>
-                    {hexToRgb(color)}
+              <td style={{ cursor: 'pointer' }} onClick={() => handleCopy(hexToRgb(color))}>
+                   <strong>{hexToRgb(color)}</strong>
                   </td>
                 </tr>
               ))}

@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+.toast-animation {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    bottom: -50px;
+    opacity: 0;
+  }
+  to {
+    bottom: 20px;
+    opacity: 1;
+  }
+}
