@@ -7,6 +7,7 @@ function App() {
   });
 
   const ding = useMemo(() => new Audio("/click.mp3"), []);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [toast, setToast] = useState("");
   const handleCopy = (text) => {
     ding.currentTime = 0; // Reset to start in case of rapid clicks
@@ -22,6 +23,14 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const handleClose = () => {
+    ding.currentTime = 0;
+    ding.play();
+    setTimeout(() => {
+      window.close(); // This tells Chrome to close the extension popup
+    }, 200);
+  };
 
   const hexToRgb = (hex) => {
     const bigInt = parseInt(hex.slice(1), 16);
@@ -40,7 +49,15 @@ function App() {
   };
 
   return (
-    <div className="window" style={{ width: "320px", margin: "10px" }}>
+    <div
+      className="window"
+      style={{
+        width: isMaximized ? "750px" : "320px",
+        height: isMaximized ? "550px" : "auto",
+        transition: "all 0.2s ease-in-out", // Smooth transition
+        margin: "10px",
+      }}
+    >
       {toast && (
         <div
           className="window toast-animation"
@@ -65,9 +82,20 @@ function App() {
       <div className="title-bar">
         <div className="title-bar-text">ColorPicker.exe</div>
         <div className="title-bar-controls">
-          <button aria-label="Minimize" />
-          <button aria-label="Maximize" />
-          <button aria-label="Close" />
+          <button aria-label="Minimize" onClick={() => {
+              ding.currentTime = 0;
+              ding.play();
+              setIsMaximized(false);
+            }}/>
+          <button
+            aria-label="Maximize"
+            onClick={() => {
+              ding.currentTime = 0;
+              ding.play();
+              setIsMaximized(true);
+            }}
+          />
+          <button aria-label="Close" onClick={handleClose} />
         </div>
       </div>
 
@@ -83,14 +111,14 @@ function App() {
             onClick={() => {
               ding.currentTime = 0;
               ding.play();
-              activateEyeDropper(); 
+              activateEyeDropper();
             }}
           >
             Pick Color
           </button>
           <button
             onClick={() => {
-              ding.currentTime=0;
+              ding.currentTime = 0;
               ding.play();
               const text = pickedColors.join("\n");
               const blob = new Blob([text], { type: "text/plain" });
@@ -166,7 +194,7 @@ function App() {
         >
           <button
             onClick={() => {
-              ding.currentTime=0;
+              ding.currentTime = 0;
               ding.play();
               setPickedColors([]);
               localStorage.removeItem("colors-list");
